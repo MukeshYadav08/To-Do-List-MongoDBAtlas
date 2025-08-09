@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>To-Do List</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>My To-Do List</h1>
+
+    <!-- Alerts -->
+    <% if (msg) { %>
+      <div class="alert success"><%= msg %></div>
+    <% } %>
+    <% if (error) { %>
+      <div class="alert error"><%= error %></div>
+    <% } %>
+
+    <!-- Add Task Form -->
+    <form action="/tasks" method="POST" class="task-form">
+      <input type="text" name="title" placeholder="Enter task title">
+      <select name="priority">
+        <option value="low">Low</option>
+        <option value="high">High</option>
+        <option value="urgent">Urgent</option>
+      </select>
+      <button type="submit"><i class="fa fa-plus"></i> Add Task</button>
+    </form>
+
+    <!-- Task List -->
+    <ul class="task-list">
+      <% tasks.forEach(task => { %>
+        <li class="<%= task.completed ? 'completed' : '' %>">
+          <form action="/tasks/<%= task._id %>/toggle?_method=PUT" method="POST" style="display:inline;">
+            <input type="checkbox" onchange="this.form.submit()" <%= task.completed ? 'checked' : '' %> >
+          </form>
+
+          <span class="task-title">
+            <%= task.title %> 
+            <small class="priority <%= task.priority %>">[<%= task.priority %>]</small>
+          </span>
+
+          <!-- Edit Button -->
+          <form action="/tasks/<%= task._id %>?_method=PUT" method="POST" style="display:inline;">
+            <input type="text" name="updatedTitle" value="<%= task.title %>" required>
+            <select name="updatedPriority">
+              <option value="low" <%= task.priority === 'low' ? 'selected' : '' %>>Low</option>
+              <option value="high" <%= task.priority === 'high' ? 'selected' : '' %>>High</option>
+              <option value="urgent" <%= task.priority === 'urgent' ? 'selected' : '' %>>Urgent</option>
+            </select>
+            <button type="submit" class="edit-btn" title="Edit Task">
+              <i class="fa fa-pencil"></i>
+            </button>
+          </form>
+
+          <!-- Delete Button -->
+          <form action="/tasks/<%= task._id %>?_method=DELETE" method="POST" style="display:inline;">
+            <button type="submit" class="delete-btn" title="Delete Task">
+              <i class="fa fa-trash"></i>
+            </button>
+          </form>
+        </li>
+      <% }) %>
+    </ul>
+  </div>
+
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; }
+    .container { max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; }
+    h1 { text-align: center; }
+    .alert { padding: 10px; margin-bottom: 10px; border-radius: 5px; }
+    .alert.success { background: #d4edda; color: #155724; }
+    .alert.error { background: #f8d7da; color: #721c24; }
+    .task-form { display: flex; gap: 10px; margin-bottom: 20px; }
+    .task-list { list-style: none; padding: 0; }
+    .task-list li { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #f9f9f9; margin-bottom: 5px; border-radius: 5px; }
+    .task-list li.completed .task-title { text-decoration: line-through; color: gray; }
+    .priority.low { color: green; }
+    .priority.high { color: orange; }
+    .priority.urgent { color: red; font-weight: bold; }
+    button { border: none; padding: 5px 10px; cursor: pointer; border-radius: 5px; }
+    .edit-btn { background: #ffc107; color: white; }
+    .delete-btn { background: #dc3545; color: white; }
+  </style>
+</body>
+</html>
